@@ -1,0 +1,62 @@
+services:
+  # OpenLDAP Service
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: ldap-server
+    # env_file:
+    #   - './variables.env'
+    ports:
+      - "389:389"  # LDAP default port
+      - "636:636"  # LDAP over TLS
+    networks:
+      - lan_net 
+
+  # Kerberos with OpenLDAP Backend
+  kerberos:
+    build: 
+      context: ./OpenLDAP-Kerberos-Server
+      args:
+        # KRB_LDAP_PASSWORD: ${KRB_LDAP_PASSWORD}
+        # KRB_LDAP_ADMINPASSWORD: ${KRB_LDAP_ADMINPASSWORD}
+        KRB_LDAP_DOMAIN: ${KRB_LDAP_DOMAIN}
+        KRB_LDAP_DN: ${KRB_LDAP_DN}
+        # KRB_LDAP_ORGANISATION: ${KRB_LDAP_ORGANISATION}
+        KRB_LDAP_TESTUSER_PASS: ${KRB_LDAP_TESTUSER_PASS}
+        KRB_LDAP_TESTUSER_UID: ${KRB_LDAP_TESTUSER_UID}
+
+        # KRB_KDC_PASSWORD: ${KRB_KDC_PASSWORD}
+        # KRB_ADMIN_PASSWORD: ${KRB_ADMIN_PASSWORD}
+        # KRB_DB_PASS: ${KRB_DB_PASS}
+        KRB_REALM: ${KRB_REALM}
+        # KRB_KDC_IP: ${KRB_KDC_IP}
+    env_file:
+      - .env
+    container_name: kerberos-server
+    ports:
+      - "88:88"    # Exposing the Kerberos authentication service (TCP/UDP)
+      - "749:749"  # Exposing the Kerberos administration service (TCP)
+    networks:
+      - lan_net
+
+  sssd-client:
+    build:
+      context: ./SSSD-client
+      args:
+        KRB_LDAP_DOMAIN: ${KRB_LDAP_DOMAIN}
+        KRB_LDAP_DN: ${KRB_LDAP_DN}
+        KRB_REALM: ${KRB_REALM}
+        KRB_KDC_IP: ${KRB_KDC_IP}
+    container_name: sssd-client
+    env_file:
+      - '.env'
+    depends_on:
+      - kerberos
+      - openldap
+    networks:
+      - lan_net
+
+networks:
+  lan_net:
+    driver: bridge  # LAN network simulating devices on the same network (Kerberos + OpenLDAP)
+  external_net:
+    driver: bridge  # Isolated network for external device (SSSD client)
