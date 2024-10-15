@@ -1,10 +1,16 @@
 services:
   # OpenLDAP Service
   openldap:
-    image: osixia/openldap:1.5.0
-    container_name: ldap-server
-    # env_file:
-    #   - './variables.env'
+    build:
+      context: ./OpenLDAP-Service
+      args:
+        LDAP_ORGANISATION: ${LDAP_ORGANISATION}
+        LDAP_DOMAIN: ${LDAP_DOMAIN}
+        LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+        KRB_REALM: ${KRB_REALM}
+        KRB_KDC_IP: ${KRB_KDC_IP}
+    env_file:
+      - '.env'
     ports:
       - "389:389"  # LDAP default port
       - "636:636"  # LDAP over TLS
@@ -16,19 +22,12 @@ services:
     build: 
       context: ./OpenLDAP-Kerberos-Server
       args:
-        # KRB_LDAP_PASSWORD: ${KRB_LDAP_PASSWORD}
-        # KRB_LDAP_ADMINPASSWORD: ${KRB_LDAP_ADMINPASSWORD}
         KRB_LDAP_DOMAIN: ${KRB_LDAP_DOMAIN}
         KRB_LDAP_DN: ${KRB_LDAP_DN}
-        # KRB_LDAP_ORGANISATION: ${KRB_LDAP_ORGANISATION}
         KRB_LDAP_TESTUSER_PASS: ${KRB_LDAP_TESTUSER_PASS}
         KRB_LDAP_TESTUSER_UID: ${KRB_LDAP_TESTUSER_UID}
 
-        # KRB_KDC_PASSWORD: ${KRB_KDC_PASSWORD}
-        # KRB_ADMIN_PASSWORD: ${KRB_ADMIN_PASSWORD}
-        # KRB_DB_PASS: ${KRB_DB_PASS}
         KRB_REALM: ${KRB_REALM}
-        # KRB_KDC_IP: ${KRB_KDC_IP}
     env_file:
       - .env
     container_name: kerberos-server
@@ -46,9 +45,9 @@ services:
         KRB_LDAP_DN: ${KRB_LDAP_DN}
         KRB_REALM: ${KRB_REALM}
         KRB_KDC_IP: ${KRB_KDC_IP}
-    container_name: sssd-client
     env_file:
       - '.env'
+    container_name: sssd-client
     depends_on:
       - kerberos
       - openldap

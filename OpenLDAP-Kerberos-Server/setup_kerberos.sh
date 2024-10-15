@@ -45,6 +45,10 @@ service krb5-admin-server start
 ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/user_to_kerberos.ldif
 kadmin.local -q "add_principal -x dn=uid=$KRB_LDAP_TESTUSER_UID,ou=People,$KRB_LDAP_DN -pw $KRB_LDAP_TESTUSER_PASS $KRB_LDAP_TESTUSER_UID"
 
+# Add Service
+# kadmin.local -q "add_principal -randkey ldap/openldap@$KRB_REALM"
+# kadmin.local -q "ktadd -k /etc/ldap/kerberos/ldap.keytab ldap/openldap@$KRB_REALM"
+
 # Clean up files
 rm /tmp/krbPrincipalName_index.ldif
 

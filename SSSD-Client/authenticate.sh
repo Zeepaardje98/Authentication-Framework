@@ -13,6 +13,16 @@ echo "Using Kerberos principal: $KRB_LDAP_TESTUSER_UID@$KRB_REALM"
 echo "Using Kerberos KDC: $KRB_KDC_IP"
 # echo "Using OpenLDAP server: $OPENLDAP_HOST"
 
-# Step 1: Authenticate to Kerberos (obtain a Kerberos ticket)
+# Authenticate to Kerberos (obtain a Kerberos ticket)
+while ! (echo "$KRB_LDAP_TESTUSER_PASS" | kinit "$KRB_LDAP_TESTUSER_UID@$KRB_REALM")
+do
+    echo "Authentication failed"
+    sleep 5
+    echo "Re-Attempting authentication"
+done
+
 echo "$KRB_LDAP_TESTUSER_PASS" | kinit "$KRB_LDAP_TESTUSER_UID@$KRB_REALM"
 klist
+
+# Perform LDAP search on Kerberos Service, to test kerberos working
+# ldapsearch -H "ldap://openldap.$LDAP_DOMAIN" -Y GSSAPI -b "$LDAP_DN"

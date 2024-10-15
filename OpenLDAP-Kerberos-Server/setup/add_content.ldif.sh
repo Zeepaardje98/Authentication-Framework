@@ -9,10 +9,11 @@ dn: ou=Groups,dc=example,dc=com
 objectClass: organizationalUnit
 ou: Groups
 
-dn: cn=miners,ou=Groups,$KRB_LDAP_DN
+dn: cn=developers,ou=Groups,$KRB_LDAP_DN
 objectClass: posixGroup
-cn: miners
+cn: developers
 gidNumber: 5000
+memberUid: $KRB_LDAP_TESTUSER_UID
 
 dn: uid=$KRB_LDAP_TESTUSER_UID,ou=People,$KRB_LDAP_DN
 objectClass: inetOrgPerson

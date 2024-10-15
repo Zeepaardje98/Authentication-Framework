@@ -1,18 +1,9 @@
-echo "Configuring Kerberos..."
+#!/bin/bash
+echo "TEST OPENLDAP RUNNING"
+# ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b cn=config dn # Check
+ldapsearch -x -H ldap://openldap:389 -D "cn=admin,dc=external,dc=com" -w adminpassword -b "dc=external,dc=com"
 
-cat > /etc/krb5.conf <<EOF
-[libdefaults]
-    default_realm = $KRB_REALM
-    dns_lookup_realm = false
-    dns_lookup_kdc = false
 
-[realms]
-    $KRB_REALM = {
-        kdc = $KRB_KDC_IP
-        admin_server = $KRB_KDC_IP
-    }
+# ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/configure_sasl.ldif
 
-[domain_realm]
-    .example.com = $KRB_REALM
-    example.com = $KRB_REALM
-EOF
+# ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/update_ACLs.ldif

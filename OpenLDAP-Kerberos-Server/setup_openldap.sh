@@ -49,7 +49,7 @@ ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/logging.ldif
 
 # Clean up files
 rm /tmp/add_content.ldif
-rm /tmp/uid_dinex.ldif
+rm /tmp/uid_index.ldif
 rm /tmp/logging.ldif
 
 echo "END OPENLDAP SETUP"
