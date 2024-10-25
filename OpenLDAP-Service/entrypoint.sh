@@ -1,37 +1,30 @@
 #!/bin/bash
+
+# First startup, set up necessary files
 CONTAINER_FIRST_STARTUP="CONTAINER_FIRST_STARTUP"
-
-echo "CONTAINER STARTED"
-
-# ldapsearch -x -H ldap://openldap -b dc=$LDAP_DN -D "cn=admin,$LDAP_DN" -w $LDAP_ADMIN_PASSWORD
-# ldapsearch -x -H ldap://openldap:389 -D "cn=admin,dc=external,dc=com" -w adminpassword -b "dc=external,dc=com"
-
-echo "Wait for OpenLDAP server to run"
-while ! ldapsearch -x -H ldap://openldap -b "dc=$LDAP_DN" -D "cn=admin,$LDAP_DN" -w "$LDAP_ADMIN_PASSWORD"
-do 
-  echo "waiting..."
-  sleep 5
-done
-echo "OpenLDAP server running!"
-
 if [ ! -f /$CONTAINER_FIRST_STARTUP ]; then
   touch /$CONTAINER_FIRST_STARTUP
 
-  # Setup
+  # Add container ID to shared list of IDs
+  echo "$HOSTNAME" > /container_ids/service-ldap.txt
+
+  # Run all setup scripts
+  for f in /tmp/setup/*.sh; do
+    bash "$f" 
+  done
+
   /tmp/setup.sh
-else
-  service slapd start
 fi
 
-# echo "wait for KDC to run"
-# while ! nc -zv kerberos 88 >/dev/null 2>&1;
-# do
-#   echo "waiting..."
-#   sleep 5
-# done
-# echo "KDC running!"
+# Authenticate to the KDC, and get kerberos ticket
+while ! kinit -k -t "/etc/krb5.keytab" "ldap/$HOSTNAME@$KRB_REALM"; do sleep 20; done
+klist
 
-# /tmp/authenticate.sh
+service slapd start
+
+# echo "TEST OPENLDAP RUNNING"
+# ldapsearch -x -H ldap://openldap -D "cn=admin,$LDAP_DN" -w $LDAP_PASSWORD -b "$LDAP_DN"
+
 
 while sleep 60
 do

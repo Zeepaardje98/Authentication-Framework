@@ -31,8 +31,6 @@ service slapd start
 echo "Test OpenLdap working"
 ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b cn=config dn # Check
 
-echo "cn=admin,$KRB_LDAP_DN"
-
 # Populate directory
 ldapadd -w "$KRB_LDAP_PASSWORD" -x -D "cn=admin,$KRB_LDAP_DN" -f /tmp/add_content.ldif
 echo "Test added content"
@@ -52,6 +50,6 @@ rm /tmp/add_content.ldif
 rm /tmp/uid_index.ldif
 rm /tmp/logging.ldif
 
-echo "END OPENLDAP SETUP"
+service slapd stop
 
-sleep 3
+echo "END OPENLDAP SETUP"

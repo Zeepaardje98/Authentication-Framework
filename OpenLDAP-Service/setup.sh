@@ -1,9 +1,62 @@
 #!/bin/bash
-echo "TEST OPENLDAP RUNNING"
-# ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b cn=config dn # Check
-ldapsearch -x -H ldap://openldap:389 -D "cn=admin,dc=external,dc=com" -w adminpassword -b "dc=external,dc=com"
 
+echo "Set up OpenLDAP"
 
-# ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/configure_sasl.ldif
+# Pre-seed debconf with OpenLDAP configuration
+echo "Pre-seeding slapd configuration..."
+debconf-set-selections <<EOF
+slapd slapd/internal/generated_adminpw password $LDAP_ADMINPASSWORD
+slapd slapd/internal/adminpw password $LDAP_ADMINPASSWORD
+slapd slapd/password2 password $LDAP_PASSWORD
+slapd slapd/password1 password $LDAP_PASSWORD
+slapd slapd/domain string $LDAP_DOMAIN
+slapd shared/organization string $LDAP_ORGANISATION
+slapd slapd/no_configuration boolean false
+slapd slapd/move_old_database boolean true
+slapd slapd/dump_database select when needed
+slapd slapd/allow_ldap_v2 boolean false
+EOF
+# Reconfigure slapd to apply the configuration
+echo "Running dpkg-reconfigure for slapd..."
+dpkg-reconfigure -f noninteractive slapd
 
 # ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/update_ACLs.ldif
+# ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/configure_sasl.ldif
+
+# Configure OpenLDAP to support GSSAPI
+# echo "BASE    dc=external,dc=com
+# URI     ldap://openldap.external.com
+# SASL_MECH GSSAPI
+# SASL_REALM EXAMPLE.COM" >> /etc/ldap/ldap.conf
+
+# Configure SASL to use a keytab
+# cat > /etc/ldap/sasl2/slapd.conf <<EOF
+# mech_list: GSSAPI
+# keytab: /etc/ldap/ldap.keytab
+# EOF
+
+# Restart rsyslog to apply configuration
+service rsyslog restart
+
+# Get kerberos keytab from shared volume
+while ! test -f "/tmp/shared/service-ldap.keytab"; do sleep 5; done # Wait for file to be available
+# cp /tmp/shared/service-ldap.keytab /etc/service-ldap.keytab
+cp /tmp/shared/service-ldap.keytab /etc/krb5.keytab
+# rm /tmp/shared/service-ldap.keytab
+chmod a+rwx /etc/krb5.keytab
+
+# echo "Starting slapd if not running..."
+service slapd start
+
+# Add logging
+ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/logging.ldif
+
+echo "TEST LOGGING LEVEL"
+ldapsearch -Y EXTERNAL -H ldapi:/// -b "cn=config" olcLogLevel
+
+# Restart openldap to apply configuration
+service slapd stop
+
+# ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/update_ACLs.ldif
+
+echo "END OPENLDAP SETUP"

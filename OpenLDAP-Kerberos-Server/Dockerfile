@@ -1,6 +1,5 @@
 # Use Ubuntu as the base image
 FROM ubuntu:20.04
-RUN printenv
 
 # Set environment variables for non-interactive apt install
 ENV DEBIAN_FRONTEND=noninteractive
@@ -14,23 +13,18 @@ RUN apt-get update && \
     krb5-admin-server \
     schema2ldif \
     # For network testing commands
-    net-tools
+    net-tools \
+    iputils-ping \
+    # Stream editor, used for fixing 'service slapd stop' bug in docker
+    sed
 
-# Arguments needed during buildtime
-ARG KRB_LDAP_DOMAIN
-ARG KRB_LDAP_DN
-ARG KRB_LDAP_TESTUSER_PASS
-ARG KRB_LDAP_TESTUSER_UID
-ARG KRB_REALM
+# Fix 'service slapd stop' bug in docker
+RUN sed -i 's/--exec $SLAPD 2/--name slapd 2/' /etc/init.d/slapd
 
 # Add files needed for LDAP and Kerberos setup. These files are produced by scripts to allow
 # for injecting the previously defined arguments.
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 COPY setup/*.sh tmp/setup/
-RUN for script in /tmp/setup/*.sh; do \
-        echo "Running $script"; \
-        /bin/bash "$script"; \
-    done
 # These files dont need injected variables
 COPY setup/krbPrincipalName_index.ldif tmp/krbPrincipalName_index.ldif
 COPY setup/logging.ldif tmp/logging.ldif
@@ -47,6 +41,6 @@ ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 COPY /*.sh /tmp/
 
 # Expose Kerberos ports
-EXPOSE 88 749
+EXPOSE 88 749 389 636
 
 CMD /tmp/entrypoint.sh
