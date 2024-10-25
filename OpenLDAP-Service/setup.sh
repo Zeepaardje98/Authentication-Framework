@@ -35,8 +35,6 @@ dpkg-reconfigure -f noninteractive slapd
 # keytab: /etc/ldap/ldap.keytab
 # EOF
 
-# Restart rsyslog to apply configuration
-service rsyslog restart
 
 # Get kerberos keytab from shared volume
 while ! test -f "/tmp/shared/service-ldap.keytab"; do sleep 5; done # Wait for file to be available
@@ -44,6 +42,8 @@ while ! test -f "/tmp/shared/service-ldap.keytab"; do sleep 5; done # Wait for f
 cp /tmp/shared/service-ldap.keytab /etc/krb5.keytab
 # rm /tmp/shared/service-ldap.keytab
 chmod a+rwx /etc/krb5.keytab
+
+cp /tmp/shared/service-ldap2.keytab /etc/krb5_2.keytab
 
 # echo "Starting slapd if not running..."
 service slapd start

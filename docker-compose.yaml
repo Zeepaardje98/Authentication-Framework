@@ -1,11 +1,12 @@
 services:
   # OpenLDAP Service
   openldap:
+    hostname: openldap
     build:
       context: ./OpenLDAP-Service
     env_file:
       - .env
-    container_name: service-ldap
+    container_name: openldap-service
     ports:
       - "389:389"  # LDAP default port
       - "636:636"  # LDAP over TLS
@@ -17,6 +18,7 @@ services:
 
   # Kerberos with OpenLDAP Backend
   kerberos:
+    hostname: kerberos
     build: 
       context: ./OpenLDAP-Kerberos-Server
     env_file:
@@ -35,6 +37,7 @@ services:
       - lan_net
 
   sssd-client:
+    hostname: sssd-client
     build:
       context: ./SSSD-client
     env_file:
