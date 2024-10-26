@@ -19,25 +19,22 @@ RUN apt-get update && \
     # Stream editor, used for fixing 'service slapd stop' bug in docker
     sed
 
-# Fix 'service slapd stop' bug in docker
+# BugFix: 'service slapd stop' not working in docker
 RUN sed -i 's/--exec $SLAPD 2/--name slapd 2/' /etc/init.d/slapd
 
-# Add files needed for LDAP and Kerberos setup. These files are produced by scripts to allow
-# for injecting the previously defined arguments.
+# Add files needed for SSSD and Kerberos setup. These files are produced by a startup script to allow
+# for injecting environment variables into these files.
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 COPY setup/*.sh tmp/setup/
 # These files dont need injected variables
-COPY setup/krbPrincipalName_index.ldif tmp/krbPrincipalName_index.ldif
-COPY setup/logging.ldif tmp/logging.ldif
-COPY setup/uid_index.ldif tmp/uid_index.ldif
+COPY setup/*.ldif tmp/
 
 
-
-# Get kerberos schema
+# Get kerberos schema for openldap
 COPY schema/kerberos.schema.gz /etc/ldap/schema/kerberos.schema.gz
 RUN gunzip /etc/ldap/schema/kerberos.schema.gz
 
-# Add setup scripts
+# Add setup and entrypoint scripts
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 COPY /*.sh /tmp/
 

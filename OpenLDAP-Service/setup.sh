@@ -42,10 +42,9 @@ ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/configure_sasl.ldif
 
 
 # Get kerberos keytab from shared volume
-while ! test -f "/tmp/shared/service-ldap.keytab"; do sleep 5; done # Wait for file to be available
-# cp /tmp/shared/service-ldap.keytab /etc/service-ldap.keytab
-cp /tmp/shared/service-ldap.keytab /etc/krb5.keytab
-# rm /tmp/shared/service-ldap.keytab
+while ! test -f "/tmp/shared_kerberos/$LDAP_SERVICE_HOST.keytab"; do sleep 5; done # Wait for file to be available
+cp /tmp/shared_kerberos/$LDAP_SERVICE_HOST.keytab /etc/krb5.keytab
+rm /tmp/shared_kerberos/$LDAP_SERVICE_HOST.keytab
 chmod a+rwx /etc/krb5.keytab
 
 # klist

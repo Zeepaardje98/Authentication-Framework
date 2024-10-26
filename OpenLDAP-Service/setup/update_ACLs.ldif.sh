@@ -14,6 +14,6 @@
 
 cat > /tmp/update_ACLs.ldif <<EOF
 access to *
-    by gssapi="ldap/openldap-service.thesis_lan_net@$KRB_REALM" read
+    by gssapi="ldap/$LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK@$KRB_REALM" read
     by * read
 EOF

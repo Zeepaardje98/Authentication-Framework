@@ -15,14 +15,14 @@ RUN apt-get update && \
     iputils-ping \
     netcat-openbsd
 
-# Add files needed for SSSD and Kerberos setup. These files are produced by scripts to allow
-# for injecting variables.
+# Add files needed for SSSD and Kerberos setup. These files are produced by a startup script to allow
+# for injecting environment variables into these files.
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 COPY setup/*.sh tmp/setup/
 # These files dont need injected variables
 
 
-# Add setup scripts
+# Add setup and entrypoint scripts
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 COPY /*.sh /tmp/
 

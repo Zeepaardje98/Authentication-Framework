@@ -1,61 +1,54 @@
 services:
   # OpenLDAP Service
   openldap:
-    hostname: openldap-service
+    hostname: ${LDAP_SERVICE_HOST}
+    container_name: ${LDAP_SERVICE_HOST}
     build:
       context: ./OpenLDAP-Service
-    env_file:
-      - .env
-    container_name: openldap-service
+    env_file: .env
+    volumes:
+      - shared_ldap:/tmp/shared_kerberos
+    networks:
+      - lan_net 
     ports:
       - "389:389"  # LDAP default port
       - "636:636"  # LDAP over TLS
-    volumes:
-      - shared:/tmp/shared
-      - container_ids:/container_ids
-    networks:
-      - lan_net 
 
   # Kerberos with OpenLDAP Backend
   kerberos:
-    hostname: kerberos-server
+    hostname: ${KERBEROS_HOST}
+    container_name: ${KERBEROS_HOST}
     build: 
       context: ./OpenLDAP-Kerberos-Server
-    env_file:
-      - .env
-    container_name: kerberos-server
-    ports:
-      - "88:88"    # Exposing the Kerberos authentication service (TCP/UDP)
-      - "749:749"  # Exposing the Kerberos administration service (TCP)
-      # - '389:389'
-      # - '636:636'
+    env_file: .env
     volumes:
-      - shared:/tmp/shared
-      - shared2:/tmp/shared2
-      - container_ids:/container_ids
+      - shared_ldap:/tmp/shared_ldap
+      - shared_sssd:/tmp/shared_sssd
     networks:
       - lan_net
+    ports:
+      - "88:88"    # Kerberos authentication service (TCP/UDP)
+      - "749:749"  # Kerberos administration service (TCP)
 
+  # SSSD Client for Kerberos
   sssd-client:
-    hostname: sssd-client
+    hostname: ${SSSD_CLIENT_HOST}
+    container_name: ${SSSD_CLIENT_HOST}
     build:
       context: ./SSSD-client
-    env_file:
-      - .env
-    container_name: sssd-client
+    env_file: .env
     volumes:
-      - shared2:/tmp/shared2
-      - container_ids:/container_ids
+      - shared_sssd:/tmp/shared_kerberos
     networks:
       - lan_net
 
 networks:
   lan_net:
     driver: bridge  # LAN network simulating devices on the same network (Kerberos + OpenLDAP)
+    name: ${ON_PREMISES_NETWORK}
   external_net:
-    driver: bridge  # Isolated network for external device (SSSD client)
+    driver: bridge  # Isolated network for external device
 
 volumes:
-  shared:
-  shared2:
-  container_ids:
+  shared_ldap:  # Sharing the keytab from kerberos server to openldap service
+  shared_sssd:  # Sharing the keytab from kerberos server to sssd client

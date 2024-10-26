@@ -5,11 +5,6 @@ CONTAINER_FIRST_STARTUP="CONTAINER_FIRST_STARTUP"
 if [ ! -f /$CONTAINER_FIRST_STARTUP ]; then
   touch /$CONTAINER_FIRST_STARTUP
 
-  # Add container ID to shared list of IDs
-  echo "$HOSTNAME" > /container_ids/service-ldap.txt
-
-  # export LDAPSASL_NOCANON=1
-
   # Run all setup scripts
   for f in /tmp/setup/*.sh; do
     bash "$f" 
@@ -19,7 +14,6 @@ if [ ! -f /$CONTAINER_FIRST_STARTUP ]; then
 fi
 
 # Authenticate to the KDC, and get kerberos ticket
-# while ! kinit -k -t "/etc/krb5.keytab" "ldap/$HOSTNAME@$KRB_REALM"; do sleep 20; done
 while ! kinit -k -t "/etc/krb5.keytab" "ldap/$HOSTNAME@$KRB_REALM"; do sleep 20; done
 klist -A
 

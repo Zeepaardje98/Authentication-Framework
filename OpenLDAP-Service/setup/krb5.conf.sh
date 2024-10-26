@@ -1,17 +1,13 @@
 #!/bin/bash
 
-# Get container ID of Identity Provider (Kerberos with OpenLDAP back-end)
-while ! (test -f '/container_ids/identity-provider.txt'); do sleep 5; done
-idp_id=$(</container_ids/identity-provider.txt)
-
 cat > /etc/krb5.conf <<EOF
 [libdefaults]
     default_realm = $KRB_REALM
 
 [realms]
     $KRB_REALM = {
-        kdc = $idp_id
-        admin_server = $idp_id
+        kdc = $KERBEROS_HOST
+        admin_server = $KERBEROS_HOST
     }
 
 [domain_realm]

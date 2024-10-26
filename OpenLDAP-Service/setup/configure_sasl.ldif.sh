@@ -12,6 +12,6 @@ olcSaslRealm: $KRB_REALM
 dn: cn=config
 changetype: modify
 replace: olcSaslHost
-olcSaslHost: openldap-service.thesis_lan_net
+olcSaslHost: $LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK
 
 EOF

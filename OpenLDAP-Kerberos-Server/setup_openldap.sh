@@ -2,8 +2,6 @@
 
 echo "Set up OpenLDAP"
 
-debconf-show slapd
-
 # Pre-seed debconf with OpenLDAP configuration
 echo "Pre-seeding slapd configuration..."
 debconf-set-selections <<EOF
