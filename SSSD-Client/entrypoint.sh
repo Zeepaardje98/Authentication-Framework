@@ -8,6 +8,10 @@ if [ ! -f /$CONTAINER_FIRST_STARTUP ]; then
   # Add container ID to shared list of IDs
   echo "$HOSTNAME" > /container_ids/sssd-client.txt
 
+  # export LDAPSASL_NOCANON=1
+
+  # echo "$LDAPSASL_NOCANON"
+
   # Run all setup scripts
   for f in /tmp/setup/*.sh; do
     bash "$f" 

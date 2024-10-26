@@ -2,7 +2,7 @@
 
 echo "Authenticating to KDC"
 
-kinit -k -t "/etc/service-sssd.keytab" "sssd/$HOSTNAME@$KRB_REALM"
+kinit -k -t "/etc/service-sssd.keytab" "sssd/$HOSTNAME.thesis_lan_net@$KRB_REALM"
 klist
 
 # sleep 20

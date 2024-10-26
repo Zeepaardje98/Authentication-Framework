@@ -37,7 +37,7 @@ cat > /tmp/krb5.conf <<EOF
     }
 
 [dbdefaults]
-    ldap_kerberos_container_dn = cn=krbContainer,dc=example,dc=com
+    ldap_kerberos_container_dn = cn=krbContainer,$KRB_LDAP_DN
 
 [dbmodules]
     openldap_ldapconf = {

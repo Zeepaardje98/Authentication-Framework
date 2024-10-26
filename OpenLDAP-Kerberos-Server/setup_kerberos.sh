@@ -53,8 +53,8 @@ kadmin.local -q "add_principal -x dn=uid=$KRB_LDAP_TESTUSER_UID,ou=People,$KRB_L
 while ! (test -f '/container_ids/sssd-client.txt'); do sleep 5; done
 sssd_id=$(</container_ids/sssd-client.txt)
 # Add SSSD Client as principal, and create keytab
-kadmin.local -q "add_principal -randkey sssd/$sssd_id@$KRB_REALM"
-kadmin.local -q "ktadd -k /etc/krb5.keytab sssd/$sssd_id@$KRB_REALM"
+kadmin.local -q "add_principal -randkey sssd/$sssd_id.thesis_lan_net@$KRB_REALM"
+kadmin.local -q "ktadd -k /etc/krb5.keytab sssd/$sssd_id.thesis_lan_net@$KRB_REALM"
 cp /etc/krb5.keytab /tmp/shared2/service-sssd.keytab
 chmod a+rwx /etc/krb5.keytab # don't know which permissions are necessary, so set all permissions for everyone. (This is not a good solution)
 
@@ -62,17 +62,16 @@ chmod a+rwx /etc/krb5.keytab # don't know which permissions are necessary, so se
 while ! (test -f '/container_ids/service-ldap.txt'); do sleep 5; done
 ldap_id=$(</container_ids/service-ldap.txt)
 # Add OpenLDAP as principal, and create keytab. Using aliases
-kadmin.local -q "add_principal -randkey ldap/openldap-service.thesis_lan_net@$KRB_REALM"
-kadmin.local -q "ktadd -k /etc/service-ldap.keytab ldap/openldap-service.thesis_lan_net@$KRB_REALM"
 kadmin.local -q "add_principal -randkey ldap/$ldap_id@$KRB_REALM"
 kadmin.local -q "ktadd -k /etc/service-ldap.keytab ldap/$ldap_id@$KRB_REALM"
+kadmin.local -q "add_principal -randkey ldap/$ldap_id.thesis_lan_net@$KRB_REALM"
+kadmin.local -q "ktadd -k /etc/service-ldap.keytab ldap/$ldap_id.thesis_lan_net@$KRB_REALM"
+
+# kadmin.local -q "modprinc -x alias=ldap/openldap-service@EXAMPLE.COM ldap/openldap-service.thesis_lan_net@EXAMPLE.COM"
+# kadmin.local -q "getprinc ldap/openldap-service.thesis_lan_net@EXAMPLE.COM"
+
 
 cp /etc/service-ldap.keytab /tmp/shared/service-ldap.keytab
-
-
-# kadmin.local -q "add_principal -randkey ldap/$ldap_id@$KRB_REALM"
-# kadmin.local -q "ktadd -k /etc/service-ldap2.keytab ldap/$ldap_id@$KRB_REALM"
-# cp /etc/service-ldap2.keytab /tmp/shared/service-ldap2.keytab
 chmod a+rwx /etc/service-ldap.keytab # don't know which permissions are necessary, so set all permissions for everyone. (This is not a good solution)
 
 echo "List principals"

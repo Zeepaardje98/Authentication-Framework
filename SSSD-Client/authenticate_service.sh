@@ -17,7 +17,7 @@ ldap_id=$(</container_ids/service-ldap.txt)
 
 echo "Authenticating to Service"
 # Perform LDAP search on Service, using kerberos ticket
-while ! (ldapsearch -Y GSSAPI -H "ldap://$ldap_id" -b "uid=$KRB_LDAP_TESTUSER_UID,$LDAP_DN")
+while ! (ldapsearch -Y GSSAPI -H "ldap://$ldap_id" -b "$LDAP_DN" -N 'ldap/openldap-service.thesis_lan_net@EXAMPLE')
 do
     sleep 60
 done

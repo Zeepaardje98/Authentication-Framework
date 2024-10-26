@@ -7,8 +7,6 @@ idp_id=$(</container_ids/identity-provider.txt)
 cat > /etc/krb5.conf <<EOF
 [libdefaults]
     default_realm = $KRB_REALM
-    dns_lookup_realm = false
-    dns_lookup_kdc = false
 
 [realms]
     $KRB_REALM = {

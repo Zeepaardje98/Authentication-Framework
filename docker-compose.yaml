@@ -1,7 +1,7 @@
 services:
   # OpenLDAP Service
   openldap:
-    hostname: openldap
+    hostname: openldap-service
     build:
       context: ./OpenLDAP-Service
     env_file:
@@ -18,7 +18,7 @@ services:
 
   # Kerberos with OpenLDAP Backend
   kerberos:
-    hostname: kerberos
+    hostname: kerberos-server
     build: 
       context: ./OpenLDAP-Kerberos-Server
     env_file:

@@ -15,6 +15,7 @@ RUN apt-get update && \
     # For network testing commands
     net-tools \
     iputils-ping \
+    dnsutils\
     # Stream editor, used for fixing 'service slapd stop' bug in docker
     sed
 

@@ -1,11 +1,11 @@
 #!/bin/bash
 
 cat > /tmp/add_content.ldif <<EOF
-dn: ou=People,dc=example,dc=com
+dn: ou=People,$KRB_LDAP_DN
 objectClass: organizationalUnit
 ou: People
 
-dn: ou=Groups,dc=example,dc=com
+dn: ou=Groups,$KRB_LDAP_DN
 objectClass: organizationalUnit
 ou: Groups
 

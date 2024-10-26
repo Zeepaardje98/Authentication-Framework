@@ -20,14 +20,19 @@ EOF
 echo "Running dpkg-reconfigure for slapd..."
 dpkg-reconfigure -f noninteractive slapd
 
+# echo "Starting slapd if not running..."
+service slapd start
+
 # ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/update_ACLs.ldif
-# ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/configure_sasl.ldif
+ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/configure_sasl.ldif
 
 # Configure OpenLDAP to support GSSAPI
 # echo "BASE    dc=external,dc=com
 # URI     ldap://openldap.external.com
 # SASL_MECH GSSAPI
-# SASL_REALM EXAMPLE.COM" >> /etc/ldap/ldap.conf
+# SASL_REALM EXAMPLE.COM
+# SASL_HOST openldap-service.thesis_lan_net
+# SASL_NOCANON on" >> /etc/ldap/ldap.conf
 
 # Configure SASL to use a keytab
 # cat > /etc/ldap/sasl2/slapd.conf <<EOF
@@ -43,10 +48,7 @@ cp /tmp/shared/service-ldap.keytab /etc/krb5.keytab
 # rm /tmp/shared/service-ldap.keytab
 chmod a+rwx /etc/krb5.keytab
 
-cp /tmp/shared/service-ldap2.keytab /etc/krb5_2.keytab
-
-# echo "Starting slapd if not running..."
-service slapd start
+# klist
 
 # Add logging
 ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/logging.ldif
