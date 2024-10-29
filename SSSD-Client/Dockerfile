@@ -13,7 +13,8 @@ RUN apt-get update && \
     krb5-user \
     # For network testing commands
     iputils-ping \
-    netcat-openbsd
+    netcat-openbsd \
+    dnsutils
 
 # Add files needed for SSSD and Kerberos setup. These files are produced by a startup script to allow
 # for injecting environment variables into these files.

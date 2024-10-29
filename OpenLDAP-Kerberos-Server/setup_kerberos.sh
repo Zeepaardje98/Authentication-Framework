@@ -46,12 +46,15 @@ ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/user_to_kerberos.ldif
 # Start admin server
 service krb5-admin-server start
 
-# Add existing test user as principal
+# Add existing test users as principal
 kadmin.local -q "add_principal -x dn=uid=$KRB_LDAP_TESTUSER_UID,ou=People,$KRB_LDAP_DN -pw $KRB_LDAP_TESTUSER_PASS $KRB_LDAP_TESTUSER_UID"
+kadmin.local -q "add_principal -x dn=uid=$KRB_LDAP_TESTUSER_UID2,ou=People,$KRB_LDAP_DN -pw $KRB_LDAP_TESTUSER_PASS $KRB_LDAP_TESTUSER_UID"
 
 # Add SSSD Client as principal, and create keytab
-kadmin.local -q "add_principal -randkey sssd/$SSSD_CLIENT_HOST.$ON_PREMISES_NETWORK@$KRB_REALM"
-kadmin.local -q "ktadd -k /etc/krb5.keytab sssd/$SSSD_CLIENT_HOST.$ON_PREMISES_NETWORK@$KRB_REALM"
+kadmin.local -q "add_principal -randkey sssd/$SSSD_CLIENT_HOST@$KRB_REALM"
+kadmin.local -q "ktadd -k /etc/krb5.keytab sssd/$SSSD_CLIENT_HOST@$KRB_REALM"
+# kadmin.local -q "add_principal -randkey sssd/$SSSD_CLIENT_HOST.$ON_PREMISES_NETWORK@$KRB_REALM"
+# kadmin.local -q "ktadd -k /etc/krb5.keytab sssd/$SSSD_CLIENT_HOST.$ON_PREMISES_NETWORK@$KRB_REALM"
 
 # Share keytab with the sssd-client
 cp /etc/krb5.keytab /tmp/shared_sssd/$SSSD_CLIENT_HOST.keytab
@@ -60,8 +63,8 @@ chmod a+rwx /etc/krb5.keytab # don't know which permissions are necessary, so se
 # Add OpenLDAP as principal, and create keytab. Using aliases
 kadmin.local -q "add_principal -randkey ldap/$LDAP_SERVICE_HOST@$KRB_REALM"
 kadmin.local -q "ktadd -k /etc/$LDAP_SERVICE_HOST.keytab ldap/$LDAP_SERVICE_HOST@$KRB_REALM"
-kadmin.local -q "add_principal -randkey ldap/$LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK@$KRB_REALM"
-kadmin.local -q "ktadd -k /etc/$LDAP_SERVICE_HOST.keytab ldap/$LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK@$KRB_REALM"
+# kadmin.local -q "add_principal -randkey ldap/$LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK@$KRB_REALM"
+# kadmin.local -q "ktadd -k /etc/$LDAP_SERVICE_HOST.keytab ldap/$LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK@$KRB_REALM"
 
 # Share keytab with the openldap service
 cp "/etc/$LDAP_SERVICE_HOST.keytab" "/tmp/shared_ldap/$LDAP_SERVICE_HOST.keytab"

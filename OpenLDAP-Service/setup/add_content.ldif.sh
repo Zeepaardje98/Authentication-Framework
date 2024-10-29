@@ -1,21 +1,11 @@
 #!/bin/bash
 
 cat > /tmp/add_content.ldif <<EOF
-dn: ou=People,$KRB_LDAP_DN
+dn: ou=People,$LDAP_DN
 objectClass: organizationalUnit
 ou: People
 
-dn: ou=Groups,$KRB_LDAP_DN
-objectClass: organizationalUnit
-ou: Groups
-
-dn: cn=developers,ou=Groups,$KRB_LDAP_DN
-objectClass: posixGroup
-cn: developers
-gidNumber: 5000
-memberUid: $KRB_LDAP_TESTUSER_UID
-
-dn: uid=$KRB_LDAP_TESTUSER_UID,ou=People,$KRB_LDAP_DN
+dn: uid=$KRB_LDAP_TESTUSER_UID,ou=People,$LDAP_DN
 objectClass: inetOrgPerson
 objectClass: posixAccount
 objectClass: shadowAccount
@@ -31,11 +21,11 @@ gecos: John Doe
 loginShell: /bin/bash
 homeDirectory: /home/$KRB_LDAP_TESTUSER_UID
 
-dn: uid=$KRB_LDAP_TESTUSER_UID2,ou=People,$KRB_LDAP_DN
+dn: uid=$KRB_LDAP_TESTUSER_UID2,ou=People,$LDAP_DN
 objectClass: inetOrgPerson
 objectClass: posixAccount
 objectClass: shadowAccount
-uid: $KRB_LDAP_TESTUSER_UID
+uid: $KRB_LDAP_TESTUSER_UID2
 sn: Doe
 givenName: John
 cn: Jane Doe
@@ -46,4 +36,19 @@ userPassword: $KRB_LDAP_TESTUSER_PASS
 gecos: Jane Doe
 loginShell: /bin/bash
 homeDirectory: /home/$KRB_LDAP_TESTUSER_UID2
+
+dn: ou=Groups,$LDAP_DN
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=gssapiGroup,ou=Groups,$LDAP_DN
+objectclass: groupofNames
+cn: gssapiGroup
+member: uid=$KRB_LDAP_TESTUSER_UID,ou=People,$LDAP_DN
+member: uid=$KRB_LDAP_TESTUSER_UID2,ou=People,$LDAP_DN
+
+dn: cn=developers,ou=Groups,$LDAP_DN
+objectclass: groupofNames
+cn: developers
+member: uid=$KRB_LDAP_TESTUSER_UID,ou=People,$LDAP_DN
 EOF

@@ -1,6 +1,5 @@
 # Use Ubuntu as the base image
-FROM ubuntu:20.04
-RUN printenv
+FROM ubuntu:24.04
 
 # Set environment variables for non-interactive apt install
 ENV DEBIAN_FRONTEND=noninteractive
@@ -16,6 +15,7 @@ RUN apt-get update && \
     # For network testing commands
     iputils-ping \
     netcat-openbsd \
+    dnsutils \
     # Stream editor, used for fixing 'service slapd stop' bug in docker
     sed
 
@@ -27,8 +27,6 @@ RUN sed -i 's/--exec $SLAPD 2/--name slapd 2/' /etc/init.d/slapd
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 COPY setup/*.sh tmp/setup/
 # These files dont need injected variables
-COPY setup/logging.ldif tmp/logging.ldif
-COPY setup/log-slapd.conf etc/rsyslog.d/log-slapd.conf
 
 
 # Add setup and entrypoint scripts

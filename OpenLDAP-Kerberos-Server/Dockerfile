@@ -1,5 +1,5 @@
 # Use Ubuntu as the base image
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 # Set environment variables for non-interactive apt install
 ENV DEBIAN_FRONTEND=noninteractive

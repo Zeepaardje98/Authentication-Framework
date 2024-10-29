@@ -18,6 +18,6 @@ cat > /etc/krb5.conf <<EOF
 [domain_realm]
     .$KRB_LDAP_DOMAIN = $KRB_REALM
     $KRB_LDAP_DOMAIN = $KRB_REALM
-    .thesis_lan_net = $KRB_REALM
-    thesis_lan_net = $KRB_REALM
+    .lan_net = EXAMPLE
+    lan_net = EXAMPLE
 EOF
