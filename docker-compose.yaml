@@ -2,6 +2,7 @@ services:
   # OpenLDAP Service
   openldap:
     hostname: ${LDAP_SERVICE_HOST}
+    domainname: ${ON_PREMISES_NETWORK}
     container_name: ${LDAP_SERVICE_HOST}
     build:
       context: ./OpenLDAP-Service
@@ -9,7 +10,7 @@ services:
     volumes:
       - shared_ldap:/tmp/shared_kerberos
     networks:
-      - lan_net 
+      - ${ON_PREMISES_NETWORK}
     ports:
       - "389:389"  # LDAP default port
       - "636:636"  # LDAP over TLS
@@ -17,6 +18,7 @@ services:
   # Kerberos with OpenLDAP Backend
   kerberos:
     hostname: ${KERBEROS_HOST}
+    # domainname: ${ON_PREMISES_NETWORK}
     container_name: ${KERBEROS_HOST}
     build: 
       context: ./OpenLDAP-Kerberos-Server
@@ -25,7 +27,7 @@ services:
       - shared_ldap:/tmp/shared_ldap
       - shared_sssd:/tmp/shared_sssd
     networks:
-      - lan_net
+      - ${ON_PREMISES_NETWORK}
     ports:
       - "88:88"    # Kerberos authentication service (TCP/UDP)
       - "749:749"  # Kerberos administration service (TCP)
@@ -33,6 +35,7 @@ services:
   # SSSD Client for Kerberos
   sssd-client:
     hostname: ${SSSD_CLIENT_HOST}
+    # domainname: ${ON_PREMISES_NETWORK}
     container_name: ${SSSD_CLIENT_HOST}
     build:
       context: ./SSSD-client
@@ -40,7 +43,7 @@ services:
     volumes:
       - shared_sssd:/tmp/shared_kerberos
     networks:
-      - lan_net
+      - ${ON_PREMISES_NETWORK}
 
 networks:
   lan_net:

@@ -9,6 +9,7 @@ olcSaslRealm: $KRB_REALM
 dn: cn=config
 changetype: modify
 replace: olcSaslHost
-olcSaslHost: $LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK
+olcSaslHost: $LDAP_SERVICE_HOST
+
 
 EOF

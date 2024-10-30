@@ -15,19 +15,30 @@ RUN apt-get update && \
     # For network testing commands
     iputils-ping \
     netcat-openbsd \
-    dnsutils \
+    dnsutils
     # Stream editor, used for fixing 'service slapd stop' bug in docker
-    sed
+    # sed
+    # Logging
+    # rsyslog
+    # inetutils-syslogd
 
 # BugFix: 'service slapd stop' not working in docker
-RUN sed -i 's/--exec $SLAPD 2/--name slapd 2/' /etc/init.d/slapd
+# RUN sed -i 's/--exec $SLAPD 2/--name slapd 2/' /etc/init.d/slapd
+
+# Configure rsyslog
+# RUN echo "local4.*    /var/log/openldap.log" >> /etc/rsyslog.d/openldap.conf
+
+# Create log file and set permissions
+# RUN touch /var/log/syslog && \
+#     chmod 777 /var/log/syslog \
+#     chown root:adm /var/log/syslog
 
 # Add files needed for SSSD and Kerberos setup. These files are produced by a startup script to allow
 # for injecting environment variables into these files.
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 COPY setup/*.sh tmp/setup/
 # These files dont need injected variables
-
+COPY setup/*.ldif tmp/
 
 # Add setup and entrypoint scripts
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache

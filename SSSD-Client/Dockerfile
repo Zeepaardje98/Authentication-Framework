@@ -21,7 +21,7 @@ RUN apt-get update && \
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 COPY setup/*.sh tmp/setup/
 # These files dont need injected variables
-
+COPY setup/*.ldif tmp/
 
 # Add setup and entrypoint scripts
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache

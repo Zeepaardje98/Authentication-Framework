@@ -15,4 +15,8 @@ cat > /etc/sssd/sssd.conf <<EOF
     krb5_realm = $KRB_REALM
     cache_credentials = true
     krb5_validate = true
+    
+    # Add this line to avoid appending .lan_net
+    dns_discovery_domain = example
+    use_fully_qualified_names = False
 EOF

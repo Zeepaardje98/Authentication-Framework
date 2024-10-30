@@ -13,7 +13,23 @@ if [ ! -f /$CONTAINER_FIRST_STARTUP ]; then
 fi
 
 # Run OpenLDAP Server
-# service slapd start
-slapd -d 384
 
-while sleep 3600; do echo "CONTAINER RUNNING"; done
+# service slapd start
+# pkill rsyslogd
+# ps aux | grep rsyslog
+# echo "-----"
+# rsyslogd
+# ps aux | grep rsyslog
+# ps aux | grep syslogd
+# echo "-----"
+# pkill slapd
+# ps aux | grep slapd
+# echo "-----"
+slapd -h "ldap:/// ldapi:///" -d 960
+# ps aux | grep slapd
+# Log level check
+ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config olcLogLevel
+
+
+
+while sleep 10; do echo "CONTAINER RUNNING"; done

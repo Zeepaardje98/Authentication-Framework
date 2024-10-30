@@ -14,7 +14,7 @@ while ! nc -zv $KERBEROS_HOST 88 >/dev/null 2>&1; do sleep 5; done
 
 # Authenticate to the openldap service, using the kerberos ticket
 while ! nc -zv $LDAP_SERVICE_HOST 389 >/dev/null 2>&1; do sleep 5; done
-/tmp/authenticate_service.sh
+/tmp/tests.sh
 
 
 # Container run loop

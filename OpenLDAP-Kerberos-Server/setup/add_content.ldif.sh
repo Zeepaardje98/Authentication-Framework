@@ -46,4 +46,20 @@ userPassword: $KRB_LDAP_TESTUSER_PASS
 gecos: Jane Doe
 loginShell: /bin/bash
 homeDirectory: /home/$KRB_LDAP_TESTUSER_UID2
+
+dn: uid=$KRB_LDAP_TESTUSER_UID3,ou=People,$KRB_LDAP_DN
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: $KRB_LDAP_TESTUSER_UID3
+sn: Doe
+givenName: Jibby
+cn: Jibby Doe
+displayName: Jibby Doe
+uidNumber: 10002
+gidNumber: 5002
+userPassword: $KRB_LDAP_TESTUSER_PASS
+gecos: Jibby Doe
+loginShell: /bin/bash
+homeDirectory: /home/$KRB_LDAP_TESTUSER_UID3
 EOF

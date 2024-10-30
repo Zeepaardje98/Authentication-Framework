@@ -7,8 +7,8 @@ replace: olcAccess
 olcAccess: to dn.subtree="dc=local"
   by group.exact="cn=developers,ou=Groups,$LDAP_DN" write
   by group.exact="cn=gssapiGroup,ou=Groups,$LDAP_DN" read
-  by * read
   by anonymous auth
+  by * none
 EOF
 
 # olcAccess: to * by * manage

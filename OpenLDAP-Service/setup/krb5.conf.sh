@@ -11,8 +11,9 @@ cat > /etc/krb5.conf <<EOF
     }
 
 [domain_realm]
-    .$KRB_LDAP_DOMAIN = $KRB_REALM
-    $KRB_LDAP_DOMAIN = $KRB_REALM
-    .lan_net = $KRB_REALM
-    lan_net = $KRB_REALM
+    $LDAP_SERVICE_HOST = $KRB_REALM
+    $SSSD_CLIENT_HOST = $KRB_REALM
+    $KERBEROS_HOST = $KRB_REALM
+    .$ON_PREMISES_NETWORK = $KRB_REALM
+    $ON_PREMISES_NETWORK = $KRB_REALM
 EOF
