@@ -67,4 +67,9 @@ cat > /tmp/krb5.conf <<EOF
     $KERBEROS_HOST = $KRB_REALM
     .$ON_PREMISES_NETWORK = $KRB_REALM
     $ON_PREMISES_NETWORK = $KRB_REALM
+
+[logging]
+    default = STDERR
+    kdc = STDERR
+    admin_server = STDERR
 EOF

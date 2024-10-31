@@ -18,7 +18,8 @@ if [ ! -f /$CONTAINER_FIRST_STARTUP ]; then
 fi
 
 service slapd start
-service krb5-kdc start
+krb5kdc -n
+# service krb5-kdc start
 service krb5-admin-server start
 
 while sleep 3600; do echo "CONTAINER RUNNING"; done

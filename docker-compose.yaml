@@ -46,7 +46,7 @@ services:
       - ${ON_PREMISES_NETWORK}
 
 networks:
-  lan_net:
+  zeepaardje-net:
     driver: bridge  # LAN network simulating devices on the same network (Kerberos + OpenLDAP)
     name: ${ON_PREMISES_NETWORK}
   external_net:
