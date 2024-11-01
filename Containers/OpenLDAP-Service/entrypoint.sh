@@ -32,4 +32,4 @@ ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config olcLogLevel
 
 
 
-while sleep 10; do echo "CONTAINER RUNNING"; done
+while sleep 3600; do echo "CONTAINER RUNNING"; done

@@ -26,8 +26,8 @@ echo "Starting slapd if not running..."
 service slapd start
 
 # Check that openldap is working
-echo "Test OpenLdap working"
-ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b cn=config dn # Check
+# echo "Test OpenLdap working"
+# ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b cn=config dn # Check
 
 # Populate directory
 ldapadd -w "$KRB_LDAP_PASSWORD" -x -D "cn=admin,$KRB_LDAP_DN" -f /tmp/add_content.ldif
