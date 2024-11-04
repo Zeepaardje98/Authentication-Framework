@@ -1,11 +1,17 @@
+### SERVICES
 services:
   # Kerberos with OpenLDAP Backend as On-Premises IdP
   lan-idp:
     hostname: ${KERBEROS_HOST}
     domainname: ${ON_PREMISES_NETWORK}
-    container_name: ${KERBEROS_HOST}.${ON_PREMISES_NETWORK}
-    build: 
-      context: /Local-IdP
+    container_name: ${KERBEROS_HOST}
+    
+    build:
+      dockerfile: /Local-IdP/Dockerfile
+      # context: .
+      args:
+        BASEFOLDER: Local-IdP # Folder that should not be dockerignored, for the dockerignore.
+    
     env_file: .env
     volumes:
       - shared_ldap:/tmp/shared_ldap
@@ -20,9 +26,13 @@ services:
   sssd-client:
     hostname: ${SSSD_CLIENT_HOST}
     domainname: ${ON_PREMISES_NETWORK}
-    container_name: ${SSSD_CLIENT_HOST}.${ON_PREMISES_NETWORK}
+    container_name: ${SSSD_CLIENT_HOST}
+    
     build:
-      context: /SSSD-client
+      dockerfile: /SSSD-Client/Dockerfile
+      args:
+          BASEFOLDER: SSSD-Client # Folder that should not be dockerignored, for the dockerignore.
+    
     env_file: .env
     volumes:
       - shared_sssd:/tmp/shared_kerberos
@@ -33,9 +43,13 @@ services:
   openldap:
     hostname: ${LDAP_SERVICE_HOST}
     domainname: ${ON_PREMISES_NETWORK}
-    container_name: ${LDAP_SERVICE_HOST}.${ON_PREMISES_NETWORK}
+    container_name: ${LDAP_SERVICE_HOST}
+    
     build:
-      context: /OpenLDAP-Service
+      dockerfile: /OpenLDAP-Service/Dockerfile
+      args:
+        BASEFOLDER: OpenLDAP-Service # Folder that should not be dockerignored, for the dockerignore.
+    
     env_file: .env
     volumes:
       - shared_ldap:/tmp/shared_kerberos
@@ -49,13 +63,19 @@ services:
   cloud-idp:
     hostname: ${CLOUD_IDP_HOST}
     domainname: ${CLOUD_IDP_NETWORK}
-    container_name: ${CLOUD_IDP_HOST}.${CLOUD_IDP_NETWORK}
+    container_name: ${CLOUD_IDP_HOST}
+    
     build:
-      context: /Cloud-IdP
+      dockerfile: /Cloud-IdP/Dockerfile
+      args:
+        BASEFOLDER: Cloud-IdP # Folder that should not be dockerignored, for the dockerignore.
+        SERVER_ID: 2
     env_file: .env
     networks:
       - ${CLOUD_IDP_NETWORK}
 
+
+### NETWORKS
 networks:
   zeepaardje-net: # LAN network for on-premises IdP and Services
     driver: bridge
@@ -67,6 +87,7 @@ networks:
     driver: bridge
     name: ${CLOUD_NETWORK1}
 
+### VOLUMES
 volumes:
   shared_ldap:  # Sharing the keytab from kerberos server to openldap service
   shared_sssd:  # Sharing the keytab from kerberos server to sssd client

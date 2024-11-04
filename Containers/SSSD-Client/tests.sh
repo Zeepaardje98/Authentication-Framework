@@ -43,7 +43,7 @@ test_whoami() {
     # Authenticate as user (first param)
     echo "$KRB_LDAP_TESTUSER_PASS" | kinit "$1@$KRB_REALM" > /dev/null 2>&1
     
-    test="ldapwhoami -Y GSSAPI -H ldap://$LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK"
+    test="ldapwhoami -Y GSSAPI -H ldap://$LDAP_SERVICE_HOST"
     message="$1 can whoami"
     wrapup=""
 }

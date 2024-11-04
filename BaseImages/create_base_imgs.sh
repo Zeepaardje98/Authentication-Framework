@@ -7,5 +7,10 @@ else
     dir='.'
 fi
 
-docker build -t base-img $dir/Base
-docker build -t base-openldap-img $dir/OpenLDAP
+# docker build --no-cache -t base $dir/Base
+# docker build --no-cache -t base-openldap $dir/OpenLDAP
+# docker build --no-cache -t base-openldap-sync $dir/OpenLDAP-Sync
+
+docker build -t base $dir/Base
+docker build -t base-openldap $dir/OpenLDAP
+docker build -t base-openldap-sync $dir/OpenLDAP-Sync

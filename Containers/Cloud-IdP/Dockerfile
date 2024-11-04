@@ -1,12 +1,7 @@
 # Use base image
-FROM base-openldap-img
+FROM base-openldap-sync
 
-# Update and install necessary packages
-# RUN apt-get update && \
-#     apt-get install -y \
-#     slapd \
-#     ldap-utils \
-#     # For network testing commands
-#     iputils-ping \
-#     netcat-openbsd \
-#     dnsutils
+# Setup server Id for a N-Way Multi-Provider LDAP synchronisation
+# COPY shared_scripts/set_serverId.ldif.sh /tmp/set_serverId.ldif.sh 
+# RUN /tmp/set_serverId.ldif.sh 1
+# RUN slapadd /tmp/set_serverId.ldif

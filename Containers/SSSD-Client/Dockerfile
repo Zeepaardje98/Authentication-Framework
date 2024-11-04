@@ -1,5 +1,5 @@
 # Use Ubuntu as the base image
-FROM ubuntu:20.04
+FROM base-img
 
 # Set environment variables for non-interactive apt install
 ENV DEBIAN_FRONTEND=noninteractive
@@ -11,20 +11,3 @@ RUN apt-get update && \
     sssd-krb5 \
     ldap-utils \
     krb5-user \
-    # For network testing commands
-    iputils-ping \
-    netcat-openbsd \
-    dnsutils
-
-# Add files needed for SSSD and Kerberos setup. These files are produced by a startup script to allow
-# for injecting environment variables into these files.
-ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
-COPY setup/*.sh tmp/setup/
-# These files dont need injected variables
-COPY setup/*.ldif tmp/
-
-# Add setup and entrypoint scripts
-ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
-COPY /*.sh /tmp/
-
-CMD /tmp/entrypoint.sh

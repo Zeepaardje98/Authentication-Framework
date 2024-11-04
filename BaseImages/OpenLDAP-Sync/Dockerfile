@@ -25,4 +25,13 @@ ONBUILD COPY ./${BASEFOLDER}/setup/ tmp/setup/
 # ONBUILD ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 ONBUILD COPY ./${BASEFOLDER}/*.sh /tmp/
 
+
+ONBUILD ARG SERVER_ID
+ONBUILD COPY /shared_scripts/set_serverId.ldif.sh /tmp/setup
+ONBUILD RUN /tmp/setup/set_serverId.ldif.sh ${SERVER_ID}
+ONBUILD RUN rm /tmp/setup/set_serverId.ldif.sh
+
+# ONBUILD RUN slapmodify -b cn=config -l /tmp/set_serverId.ldif
+# ONBUILD RUN rm /tmp/set_serverId.ldif
+
 CMD /tmp/entrypoint.sh
