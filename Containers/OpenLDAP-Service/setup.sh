@@ -32,8 +32,8 @@ chmod a+rwx /etc/krb5.keytab
 klist -k /etc/krb5.keytab
 
 # Authenticate to the KDC, and get kerberos ticket
-while ! kinit -k -t "/etc/krb5.keytab" "ldap/$HOSTNAME.$ON_PREMISES_NETWORK@$KRB_REALM"; do sleep 20; done
-# while ! kinit -k -t "/etc/krb5.keytab" "ldap/$HOSTNAME@$KRB_REALM"; do sleep 20; done
+while ! kinit -V -k -t "/etc/krb5.keytab" "ldap/$HOSTNAME.$ON_PREMISES_NETWORK@$KRB_REALM"; do sleep 20; done
+# while ! kinit -V -k -t "/etc/krb5.keytab" "ldap/$HOSTNAME@$KRB_REALM"; do sleep 20; done
 
 
 klist -k /etc/krb5.keytab

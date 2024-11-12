@@ -1,7 +1,4 @@
 # Use Ubuntu as the base image
-# FROM ubuntu:24.04
-
-# Use Ubuntu as the base image
 FROM base-openldap-sync
 
 # Set environment variables for non-interactive apt install

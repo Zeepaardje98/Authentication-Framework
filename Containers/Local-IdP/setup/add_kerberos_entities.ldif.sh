@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat > /tmp/add_kerberos_entities.ldif <<EOF
+cat > /tmp/setup/add_kerberos_entities.ldif <<EOF
 dn: uid=kdc-service,$KRB_LDAP_DN
 uid: kdc-service
 objectClass: account

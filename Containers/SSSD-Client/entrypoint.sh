@@ -9,11 +9,11 @@ if [ ! -f /$CONTAINER_FIRST_STARTUP ]; then
 fi
 
 # Authenticate to the KDC, and get kerberos ticket
-while ! nc -zv $KERBEROS_HOST 88 >/dev/null 2>&1; do sleep 5; done
+while ! nc -zv $KERBEROS_HOST.$ON_PREMISES_NETWORK 88 >/dev/null 2>&1; do sleep 5; done
 /tmp/authenticate_kdc.sh
 
 # Authenticate to the openldap service, using the kerberos ticket
-while ! nc -zv $LDAP_SERVICE_HOST 389 >/dev/null 2>&1; do sleep 5; done
+while ! nc -zv $LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK 389 >/dev/null 2>&1; do sleep 5; done
 /tmp/tests.sh
 
 

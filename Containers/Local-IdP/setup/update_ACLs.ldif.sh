@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat > /tmp/update_ACLs.ldif <<EOF
+cat > /tmp/setup/update_ACLs.ldif <<EOF
 dn: olcDatabase={1}mdb,cn=config
 add: olcAccess
 olcAccess: {2}to attrs=krbPrincipalKey

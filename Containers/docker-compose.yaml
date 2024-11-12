@@ -1,16 +1,22 @@
 ### SERVICES
 services:
   # Kerberos with OpenLDAP Backend as On-Premises IdP
-  lan-idp:
+  lan-idp-container:
+    container_name: ${KERBEROS_HOST}
     hostname: ${KERBEROS_HOST}
     domainname: ${ON_PREMISES_NETWORK}
-    container_name: ${KERBEROS_HOST}
     
     build:
       dockerfile: /Local-IdP/Dockerfile
       # context: .
       args:
-        BASEFOLDER: Local-IdP # Folder that should not be dockerignored, for the dockerignore.
+        BASEFOLDER: Local-IdP
+        SERVER_ID: 1
+        ADMINPASSWORD: ${KRB_LDAP_ADMINPASSWORD}
+        ROOTPASSWORD: ${KRB_LDAP_PASSWORD}
+        DOMAIN: ${KRB_LDAP_DOMAIN}
+        ORGANISATION: ${KRB_LDAP_ORGANISATION}
+        SYNCSERVERS: ${LDAP_SYNC_DOMAINS}
     
     env_file: .env
     volumes:
@@ -18,20 +24,21 @@ services:
       - shared_sssd:/tmp/shared_sssd
     networks:
       - ${ON_PREMISES_NETWORK}
+      # - internet
     ports:
       - "88:88"    # Kerberos authentication service (TCP/UDP)
       - "749:749"  # Kerberos administration service (TCP)
 
   # SSSD Client for Kerberos
-  sssd-client:
-    hostname: ${SSSD_CLIENT_HOST}
-    domainname: ${ON_PREMISES_NETWORK}
+  sssd-client-container:
     container_name: ${SSSD_CLIENT_HOST}
+    hostname: ${SSSD_CLIENT_HOST}
+    # domainname: ${ON_PREMISES_NETWORK}
     
     build:
       dockerfile: /SSSD-Client/Dockerfile
       args:
-          BASEFOLDER: SSSD-Client # Folder that should not be dockerignored, for the dockerignore.
+          BASEFOLDER: SSSD-Client
     
     env_file: .env
     volumes:
@@ -40,15 +47,15 @@ services:
       - ${ON_PREMISES_NETWORK}
 
   # OpenLDAP Service, for testing on-premises Kerberos Authentication
-  openldap:
-    hostname: ${LDAP_SERVICE_HOST}
-    domainname: ${ON_PREMISES_NETWORK}
+  openldap-service-container:
     container_name: ${LDAP_SERVICE_HOST}
+    hostname: ${LDAP_SERVICE_HOST}
+    # domainname: ${ON_PREMISES_NETWORK}
     
     build:
       dockerfile: /OpenLDAP-Service/Dockerfile
       args:
-        BASEFOLDER: OpenLDAP-Service # Folder that should not be dockerignored, for the dockerignore.
+        BASEFOLDER: OpenLDAP-Service
     
     env_file: .env
     volumes:
@@ -60,23 +67,32 @@ services:
       - "636:636"  # LDAP over TLS
 
   # OpenLDAP for Cloud IdP
-  cloud-idp:
-    hostname: ${CLOUD_IDP_HOST}
-    domainname: ${CLOUD_IDP_NETWORK}
+  cloud-idp-container:
     container_name: ${CLOUD_IDP_HOST}
+    hostname: ${CLOUD_IDP_HOST}
+    # domainname: ${CLOUD_IDP_NETWORK}
     
     build:
       dockerfile: /Cloud-IdP/Dockerfile
       args:
-        BASEFOLDER: Cloud-IdP # Folder that should not be dockerignored, for the dockerignore.
+        BASEFOLDER: Cloud-IdP
         SERVER_ID: 2
+        ADMINPASSWORD: ${KRB_LDAP_ADMINPASSWORD}
+        ROOTPASSWORD: ${KRB_LDAP_PASSWORD}
+        DOMAIN: ${KRB_LDAP_DOMAIN}
+        ORGANISATION: ${KRB_LDAP_ORGANISATION}
+        SYNCSERVERS: ${LDAP_SYNC_DOMAINS}
+
     env_file: .env
     networks:
       - ${CLOUD_IDP_NETWORK}
-
+      - internet
 
 ### NETWORKS
 networks:
+  internet:
+    driver: bridge
+    name: internet
   zeepaardje-net: # LAN network for on-premises IdP and Services
     driver: bridge
     name: ${ON_PREMISES_NETWORK}

@@ -8,7 +8,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y \
     slapd \
-    ldap-utils
+    ldap-utils \
+    # For network testing commands
+    iputils-ping \
+    netcat-openbsd \
+    dnsutils
 
 # Base folder of the docker image. All files outside of Containers/${FOLDER} or
 # Containers/shared_scripts get ignored by .dockerignore

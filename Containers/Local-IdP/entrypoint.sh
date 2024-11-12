@@ -17,9 +17,10 @@ if [ ! -f /$CONTAINER_FIRST_STARTUP ]; then
     /tmp/setup_kerberos.sh
 fi
 
-service slapd start
-krb5kdc -n
-# service krb5-kdc start
+# service slapd start
+slapd -h "ldap:/// ldapi:///" #-d 960
+# krb5kdc -n
+service krb5-kdc start
 service krb5-admin-server start
 
 while sleep 3600; do echo "CONTAINER RUNNING"; done

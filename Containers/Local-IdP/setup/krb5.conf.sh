@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat > /tmp/krb5.conf <<EOF
+cat > /tmp/setup/krb5.conf <<EOF
 [libdefaults]
     default_realm = $KRB_REALM
 
