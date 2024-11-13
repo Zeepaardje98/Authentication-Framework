@@ -24,6 +24,7 @@ services:
       - shared_sssd:/tmp/shared_sssd
     networks:
       - ${ON_PREMISES_NETWORK}
+      - internet
     ports:
       - "88:88"    # Kerberos authentication service (TCP/UDP)
       - "749:749"  # Kerberos administration service (TCP)
@@ -88,6 +89,7 @@ services:
     env_file: .env
     networks:
       - ${CLOUD_IDP_NETWORK}
+      - internet
 
 
 ### NETWORKS
@@ -101,6 +103,9 @@ networks:
   cloud-service1: # Network for a cloud Service
     driver: bridge
     name: ${CLOUD_NETWORK1}
+  internet:
+    driver: bridge
+    name: web
 
 ### VOLUMES
 volumes:
