@@ -11,6 +11,12 @@ services:
       # context: .
       args:
         BASEFOLDER: Local-IdP # Folder that should not be dockerignored, for the dockerignore.
+        SERVER_ID: 1
+        ADMINPASSWORD: ${KRB_LDAP_ADMINPASSWORD}
+        ROOTPASSWORD: ${KRB_LDAP_PASSWORD}
+        DOMAIN: ${KRB_LDAP_DOMAIN}
+        ORGANISATION: ${KRB_LDAP_ORGANISATION}
+        SYNCSERVERS: ${LDAP_SYNC_DOMAINS}
     
     env_file: .env
     volumes:
@@ -49,6 +55,10 @@ services:
       dockerfile: /OpenLDAP-Service/Dockerfile
       args:
         BASEFOLDER: OpenLDAP-Service # Folder that should not be dockerignored, for the dockerignore.
+        ADMINPASSWORD: ${LDAP_ADMINPASSWORD}
+        ROOTPASSWORD: ${LDAP_PASSWORD}
+        DOMAIN: ${LDAP_DOMAIN}
+        ORGANISATION: ${LDAP_ORGANISATION}
     
     env_file: .env
     volumes:
@@ -70,6 +80,11 @@ services:
       args:
         BASEFOLDER: Cloud-IdP # Folder that should not be dockerignored, for the dockerignore.
         SERVER_ID: 2
+        ADMINPASSWORD: ${KRB_LDAP_ADMINPASSWORD}
+        ROOTPASSWORD: ${KRB_LDAP_PASSWORD}
+        DOMAIN: ${KRB_LDAP_DOMAIN}
+        ORGANISATION: ${KRB_LDAP_ORGANISATION}
+        SYNCSERVERS: ${LDAP_SYNC_DOMAINS}
     env_file: .env
     networks:
       - ${CLOUD_IDP_NETWORK}

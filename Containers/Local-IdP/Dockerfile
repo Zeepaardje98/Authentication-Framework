@@ -12,9 +12,7 @@ RUN apt-get update && \
     apt-get install -y \
     krb5-kdc-ldap \
     krb5-admin-server \
-    schema2ldif \
-    # Stream editor, used for fixing 'service slapd stop' bug in docker
-    sed
+    schema2ldif
 
 # Get kerberos schema for openldap
 ADD ${BASEFOLDER}/schema/kerberos.schema.gz /etc/ldap/schema/kerberos.schema.gz

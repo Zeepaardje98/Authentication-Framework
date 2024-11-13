@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # Pre-seed debconf with OpenLDAP configuration
-debconf-set-selections <<EOF
-slapd slapd/internal/generated_adminpw password $LDAP_ADMINPASSWORD
-slapd slapd/internal/adminpw password $LDAP_ADMINPASSWORD
-slapd slapd/password2 password $LDAP_PASSWORD
-slapd slapd/password1 password $LDAP_PASSWORD
-slapd slapd/domain string $LDAP_DOMAIN
-slapd shared/organization string $LDAP_ORGANISATION
-EOF
+# debconf-set-selections <<EOF
+# slapd slapd/internal/generated_adminpw password $LDAP_ADMINPASSWORD
+# slapd slapd/internal/adminpw password $LDAP_ADMINPASSWORD
+# slapd slapd/password2 password $LDAP_PASSWORD
+# slapd slapd/password1 password $LDAP_PASSWORD
+# slapd slapd/domain string $LDAP_DOMAIN
+# slapd shared/organization string $LDAP_ORGANISATION
+# EOF
 # Reconfigure slapd to apply the configuration
-dpkg-reconfigure -f noninteractive slapd
+# dpkg-reconfigure -f noninteractive slapd
 
 slapadd -l /tmp/add_content.ldif -n 1
 slapmodify -b cn=config -l /tmp/map_gssapi_users.ldif
