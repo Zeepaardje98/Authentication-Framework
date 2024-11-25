@@ -1,5 +1,5 @@
 # Use Ubuntu as the base image
-FROM base-img
+FROM base
 
 # Set environment variables for non-interactive apt install
 ENV DEBIAN_FRONTEND=noninteractive

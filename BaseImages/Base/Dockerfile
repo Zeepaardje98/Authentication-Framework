@@ -12,6 +12,8 @@ RUN apt-get update && \
     netcat-openbsd \
     dnsutils
 
+ONBUILD ARG BASEFOLDER
+
 # Add files needed for setup
 # ONBUILD ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 ONBUILD COPY ./${BASEFOLDER}/setup/ tmp/setup/
@@ -19,3 +21,5 @@ ONBUILD COPY ./${BASEFOLDER}/setup/ tmp/setup/
 # Add setup and entrypoint scripts
 # ONBUILD ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 ONBUILD COPY ./${BASEFOLDER}/*.sh /tmp/
+
+CMD /tmp/entrypoint.sh
