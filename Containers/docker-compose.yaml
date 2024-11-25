@@ -1,0 +1,113 @@
+### SERVICES
+services:
+  # Kerberos with OpenLDAP Backend as On-Premises IdP
+  lan-idp:
+    hostname: ${KERBEROS_HOST}
+    domainname: ${ON_PREMISES_NETWORK}
+    container_name: ${KERBEROS_HOST}
+    
+    build:
+      dockerfile: /Local-IdP/Dockerfile
+      # context: .
+      args:
+        BASEFOLDER: Local-IdP # Folder that should not be dockerignored, for the dockerignore.
+        SERVER_ID: 1
+        ADMINPASSWORD: ${KRB_LDAP_ADMINPASSWORD}
+        ROOTPASSWORD: ${KRB_LDAP_PASSWORD}
+        DOMAIN: ${KRB_LDAP_DOMAIN}
+        ORGANISATION: ${KRB_LDAP_ORGANISATION}
+        SYNCSERVERS: ${LDAP_SYNC_DOMAINS}
+    
+    env_file: .env
+    volumes:
+      - shared_ldap:/tmp/shared_ldap
+      - shared_sssd:/tmp/shared_sssd
+    networks:
+      - ${ON_PREMISES_NETWORK}
+      - internet
+    ports:
+      - "88:88"    # Kerberos authentication service (TCP/UDP)
+      - "749:749"  # Kerberos administration service (TCP)
+
+  # SSSD Client for Kerberos
+  sssd-client:
+    hostname: ${SSSD_CLIENT_HOST}
+    domainname: ${ON_PREMISES_NETWORK}
+    container_name: ${SSSD_CLIENT_HOST}
+    
+    build:
+      dockerfile: /SSSD-Client/Dockerfile
+      args:
+          BASEFOLDER: SSSD-Client # Folder that should not be dockerignored, for the dockerignore.
+    
+    env_file: .env
+    volumes:
+      - shared_sssd:/tmp/shared_kerberos
+    networks:
+      - ${ON_PREMISES_NETWORK}
+
+  # OpenLDAP Service, for testing on-premises Kerberos Authentication
+  openldap:
+    hostname: ${LDAP_SERVICE_HOST}
+    domainname: ${ON_PREMISES_NETWORK}
+    container_name: ${LDAP_SERVICE_HOST}
+    
+    build:
+      dockerfile: /OpenLDAP-Service/Dockerfile
+      args:
+        BASEFOLDER: OpenLDAP-Service # Folder that should not be dockerignored, for the dockerignore.
+        ADMINPASSWORD: ${LDAP_ADMINPASSWORD}
+        ROOTPASSWORD: ${LDAP_PASSWORD}
+        DOMAIN: ${LDAP_DOMAIN}
+        ORGANISATION: ${LDAP_ORGANISATION}
+    
+    env_file: .env
+    volumes:
+      - shared_ldap:/tmp/shared_kerberos
+    networks:
+      - ${ON_PREMISES_NETWORK}
+    ports:
+      - "389:389"  # LDAP default port
+      - "636:636"  # LDAP over TLS
+
+  # OpenLDAP for Cloud IdP
+  cloud-idp:
+    hostname: ${CLOUD_IDP_HOST}
+    domainname: ${CLOUD_IDP_NETWORK}
+    container_name: ${CLOUD_IDP_HOST}
+    
+    build:
+      dockerfile: /Cloud-IdP/Dockerfile
+      args:
+        BASEFOLDER: Cloud-IdP # Folder that should not be dockerignored, for the dockerignore.
+        SERVER_ID: 2
+        ADMINPASSWORD: ${KRB_LDAP_ADMINPASSWORD}
+        ROOTPASSWORD: ${KRB_LDAP_PASSWORD}
+        DOMAIN: ${KRB_LDAP_DOMAIN}
+        ORGANISATION: ${KRB_LDAP_ORGANISATION}
+        SYNCSERVERS: ${LDAP_SYNC_DOMAINS}
+    env_file: .env
+    networks:
+      - ${CLOUD_IDP_NETWORK}
+      - internet
+
+
+### NETWORKS
+networks:
+  zeepaardje-net: # LAN network for on-premises IdP and Services
+    driver: bridge
+    name: ${ON_PREMISES_NETWORK}
+  zeepaardje-cloud-net: # Network for the cloud IdP
+    driver: bridge
+    name: ${CLOUD_IDP_NETWORK}
+  cloud-service1: # Network for a cloud Service
+    driver: bridge
+    name: ${CLOUD_NETWORK1}
+  internet:
+    driver: bridge
+    name: web
+
+### VOLUMES
+volumes:
+  shared_ldap:  # Sharing the keytab from kerberos server to openldap service
+  shared_sssd:  # Sharing the keytab from kerberos server to sssd client

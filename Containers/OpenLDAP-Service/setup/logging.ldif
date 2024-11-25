@@ -1,0 +1,9 @@
+# dn: cn=config
+# changetype: modify
+# replace: olcLocalSSF
+# olcLocalSSF: 71
+
+dn: cn=config
+changetype: modify
+replace: olcLogLevel
+olcLogLevel: 960
