@@ -23,11 +23,15 @@
 
 
 echo "Starting slapd if not running..."
-service slapd start
-
+# service slapd -h "ldap://IdP-Local-1.web ldapi:///" start
+slapd -h "ldap://IdP-Local-1.web ldapi:///" -d 256 &
+sleep 10
+# sleep 1000
 # Check that openldap is working
-# echo "Test OpenLdap working"
-# ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b cn=config dn # Check
+echo "Test OpenLdap working"
+ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b cn=config dn # Check
+
+sleep 5
 
 # Populate directory
 ldapadd -w "$KRB_LDAP_PASSWORD" -x -D "cn=admin,$KRB_LDAP_DN" -f /tmp/add_content.ldif
@@ -48,6 +52,6 @@ rm /tmp/add_content.ldif
 rm /tmp/uid_index.ldif
 rm /tmp/logging.ldif
 
-service slapd stop
+# service slapd stop
 
 echo "END OPENLDAP SETUP"

@@ -10,6 +10,8 @@ fi
 filepath="/tmp/setup/add_sync_servers.ldif"
 rootpassword=$1
 shift
+ldap_dn=$1
+shift
 
 cat > $filepath <<EOF
 # Set up provider node
@@ -42,17 +44,11 @@ EOF
 
 c=1
 for serverDomain in "$@"; do
-    echo "olcSyncRepl: rid=00$c provider=\"ldap://$serverDomain\" binddn=\"cn=config\" bindmethod=simple \
+    echo "olcSyncRepl: rid=00$c provider=\"ldap://$serverDomain\" binddn=\"cn=admin,cn=config\" bindmethod=simple \
 credentials=$rootpassword searchbase=\"cn=config\" type=refreshAndPersist retry=\"5 5 300 5\" timeout=1" \
     >> $filepath
     ((c++))
 done
-# olcSyncRepl: rid=001 provider=$KERBEROS_HOST.$ON_PREMISES_NETWORK binddn="cn=config" bindmethod=simple
-#     credentials=secret searchbase="cn=config" type=refreshAndPersist retry="5 5 300 5" timeout=1
-# olcSyncRepl: rid=002 provider=$CLOUD_IDP_HOST.$CLOUD_IDP_NETWORK binddn="cn=config" bindmethod=simple
-#     credentials=secret searchbase="cn=config" type=refreshAndPersist retry="5 5 300 5" timeout=1
-# olcSyncRepl: rid=003 provider=$LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK binddn="cn=config" bindmethod=simple
-#     credentials=secret searchbase="cn=config" type=refreshAndPersist retry="5 5 300 5" timeout=1
 
 cat >> $filepath <<EOF
 -

@@ -53,6 +53,19 @@ ONBUILD RUN echo "slapd slapd/internal/generated_adminpw password ${ADMINPASSWOR
 # Reconfigure slapd to apply the configuration
 ONBUILD RUN dpkg-reconfigure -f noninteractive slapd
 
+# Create ldif for correct listeners (SLAPD_SERVICES in /etc/default/slapd)
+ONBUILD ARG URLS
+ONBUILD COPY /shared_scripts/modify_listeners.ldif.sh /tmp/setup
+ONBUILD COPY /shared_scripts/modify_listeners.sh /tmp/setup
+ONBUILD RUN /tmp/setup/modify_listeners.ldif.sh ${URLS}
+# ONBUILD RUN /tmp/setup/modify_listeners.sh ${URLS}
+ONBUILD RUN rm /tmp/setup/modify_listeners.ldif.sh
+# ONBUILD RUN rm /tmp/setup/modify_listeners.sh
+# Apply listener settings
+ONBUILD USER openldap
+# ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/modify_listeners.ldif
+ONBUILD USER root
+
 # Create ldif file for server Id (needed for synchronisation)
 ONBUILD ARG SERVER_ID
 ONBUILD COPY /shared_scripts/set_serverId.ldif.sh /tmp/setup
@@ -60,7 +73,7 @@ ONBUILD RUN /tmp/setup/set_serverId.ldif.sh ${SERVER_ID}
 ONBUILD RUN rm /tmp/setup/set_serverId.ldif.sh
 # Apply server Id settings
 ONBUILD USER openldap
-# ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/set_serverId.ldif
+ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/set_serverId.ldif
 ONBUILD USER root
 # ONBUILD RUN rm /tmp/setup/set_serverId.ldif
 
@@ -70,25 +83,26 @@ ONBUILD RUN /tmp/setup/setup_provider.ldif.sh
 ONBUILD RUN rm /tmp/setup/setup_provider.ldif.sh
 # Apply provider settings
 ONBUILD USER openldap
-# ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/setup_provider.ldif
+ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/setup_provider.ldif
 ONBUILD USER root
 # ONBUILD RUN rm /tmp/setup/setup_provider.ldif
 
 # Create ldif for which servers to sync
 ONBUILD ARG SYNCSERVERS
+ONBUILD ARG SYNC_DN
 ONBUILD COPY /shared_scripts/add_sync_servers.ldif.sh /tmp/setup
-ONBUILD RUN /tmp/setup/add_sync_servers.ldif.sh ${ROOTPASSWORD} ${SYNCSERVERS}
+ONBUILD RUN /tmp/setup/add_sync_servers.ldif.sh ${ROOTPASSWORD} ${SYNC_DN} ${SYNCSERVERS}
 ONBUILD RUN rm /tmp/setup/add_sync_servers.ldif.sh
 # Apply server sync settings
 ONBUILD USER openldap
-# ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/add_sync_servers.ldif
+ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/add_sync_servers.ldif
 ONBUILD USER root
 # ONBUILD RUN rm /tmp/setup/add_sync_servers.ldif
 
 # ONBUILD RUN service slapd stop
 
 # Change file ownership from slapmodify user(root) to openldap user
-# ONBUILD RUN chown -R openldap:openldap /etc/ldap/slapd.d /var/lib/ldap
-
+ONBUILD RUN chown -R openldap:openldap /etc/ldap /var/lib/ldap
+# ONBUILD USER openldap
 
 CMD /tmp/entrypoint.sh

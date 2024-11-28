@@ -17,6 +17,8 @@ services:
         DOMAIN: ${KRB_LDAP_DOMAIN}
         ORGANISATION: ${KRB_LDAP_ORGANISATION}
         SYNCSERVERS: ${LDAP_SYNC_DOMAINS}
+        SYNC_DN: ${KRB_LDAP_DN}
+        URLS: ${KERBEROS_HOST}.web
     
     env_file: .env
     volumes:
@@ -86,6 +88,9 @@ services:
         DOMAIN: ${KRB_LDAP_DOMAIN}
         ORGANISATION: ${KRB_LDAP_ORGANISATION}
         SYNCSERVERS: ${LDAP_SYNC_DOMAINS}
+        SYNC_DN: ${KRB_LDAP_DN}
+        URLS: ${CLOUD_IDP_HOST}.web
+
     env_file: .env
     networks:
       - ${CLOUD_IDP_NETWORK}
