@@ -17,7 +17,7 @@ if [ ! -f /$CONTAINER_FIRST_STARTUP ]; then
     /tmp/setup_kerberos.sh
 fi
 
-service slapd start
+# service slapd start
 krb5kdc -n
 # service krb5-kdc start
 service krb5-admin-server start

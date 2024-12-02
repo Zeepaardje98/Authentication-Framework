@@ -99,8 +99,6 @@ ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/add_sync_servers.ldif
 ONBUILD USER root
 # ONBUILD RUN rm /tmp/setup/add_sync_servers.ldif
 
-# ONBUILD RUN service slapd stop
-
 # Change file ownership from slapmodify user(root) to openldap user
 ONBUILD RUN chown -R openldap:openldap /etc/ldap /var/lib/ldap
 # ONBUILD USER openldap
