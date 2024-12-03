@@ -8,31 +8,4 @@ objectClass: olcModuleList
 cn: module
 olcModulePath: /usr/lib/ldap
 olcModuleLoad: syncprov.so
-
-# dn: olcOverlay=syncprov,olcDatabase={0}config,cn=config
-# changetype: add
-# objectClass: olcOverlayConfig
-# olcOverlay: syncprov
-# -
-# 
-# dn: cn=config
-# changetype: modify
-# replace: olcServerID
-# olcServerID: 1 $KERBEROS_HOST.$ON_PREMISES_NETWORK
-# olcServerID: 2 $CLOUD_IDP_HOST.$CLOUD_IDP_NETWORK
-# olcServerID: 3 $LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK
-# -
-# 
-# dn: olcDatabase={0}config,cn=config
-# changetype: modify
-# add: olcSyncRepl
-# olcSyncRepl: rid=001 provider=$KERBEROS_HOST.$ON_PREMISES_NETWORK binddn="cn=config" bindmethod=simple
-#     credentials=secret searchbase="cn=config" type=refreshAndPersist retry="5 5 300 5" timeout=1
-# olcSyncRepl: rid=002 provider=$CLOUD_IDP_HOST.$CLOUD_IDP_NETWORK binddn="cn=config" bindmethod=simple
-#     credentials=secret searchbase="cn=config" type=refreshAndPersist retry="5 5 300 5" timeout=1
-# olcSyncRepl: rid=003 provider=$LDAP_SERVICE_HOST.$ON_PREMISES_NETWORK binddn="cn=config" bindmethod=simple
-#     credentials=secret searchbase="cn=config" type=refreshAndPersist retry="5 5 300 5" timeout=1
-# -
-# add: olcMultiProvider
-# olcMultiProvider: TRUE
-# EOF
+EOF

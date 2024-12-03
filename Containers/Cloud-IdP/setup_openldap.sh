@@ -31,5 +31,5 @@ echo "Set up OpenLDAP"
 # slapmodify -b cn=config -l /tmp/set_serverId.ldif
 
 slapd -h "ldap://IdP-Cloud-1.web ldapi:///" -d 256
-
-sleep 5
+sleep 10
+ldap-schema-manager -i kerberos.schema

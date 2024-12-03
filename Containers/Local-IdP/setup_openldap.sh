@@ -24,12 +24,17 @@
 
 echo "Starting slapd if not running..."
 # service slapd -h "ldap://IdP-Local-1.web ldapi:///" start
-slapd -h "ldap://IdP-Local-1.web ldapi:///" &
+
+slapd -h "ldap://IdP-Local-1.web ldapi:///" -d 256 &
 sleep 10
-# sleep 1000
+ldap-schema-manager -i kerberos.schema
+
 # Check that openldap is working
 echo "Test OpenLdap working"
 ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b cn=config dn # Check
+
+# Add Data Replication
+
 
 # Populate directory
 ldapadd -w "$KRB_LDAP_PASSWORD" -x -H ldapi:/// -D "cn=admin,$KRB_LDAP_DN" -f /tmp/setup/add_content.ldif && \
@@ -45,12 +50,7 @@ echo "Test added index"
 ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b \ cn=config '(olcDatabase={1}mdb)' olcDbIndex # Check
 
 # Add logging
-ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/setup/logging.ldif
-
-
-# Clean up files
-rm /tmp/setup/add_content.ldif
-rm /tmp/setup/uid_index.ldif
+ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/setup/logging.ldif && \
 rm /tmp/setup/logging.ldif
 
 # service slapd stop

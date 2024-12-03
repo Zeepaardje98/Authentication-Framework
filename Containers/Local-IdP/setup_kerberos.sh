@@ -7,7 +7,7 @@ echo "Set up Kerberos"
 
 # service slapd start
 
-ldap-schema-manager -i kerberos.schema
+# ldap-schema-manager -i kerberos.schema
 
 # Add Index
 ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/setup/krbPrincipalName_index.ldif

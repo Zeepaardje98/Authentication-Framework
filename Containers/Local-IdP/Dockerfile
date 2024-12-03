@@ -15,8 +15,8 @@ RUN apt-get update && \
     schema2ldif
 
 # Get kerberos schema for openldap
-ADD ${BASEFOLDER}/schema/kerberos.schema.gz /etc/ldap/schema/kerberos.schema.gz
-RUN gunzip /etc/ldap/schema/kerberos.schema.gz
+# ADD ${BASEFOLDER}/schema/kerberos.schema.gz /etc/ldap/schema/kerberos.schema.gz
+# RUN gunzip /etc/ldap/schema/kerberos.schema.gz
 
 # Expose Kerberos ports
 EXPOSE 88 749 389 636
