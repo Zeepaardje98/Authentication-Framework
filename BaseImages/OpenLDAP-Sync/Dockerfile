@@ -9,6 +9,8 @@ RUN apt-get update && \
     apt-get install -y \
     slapd \
     ldap-utils \
+    # ldap-schema-manager
+    schema2ldif \
     # Fix slapd not stopping on service slapd stop
     sed \
     # For network testing commands
@@ -17,7 +19,6 @@ RUN apt-get update && \
     dnsutils
 
 RUN sed -i 's/--exec $SLAPD 2/--name slapd 2/' /etc/init.d/slapd
-
 
 # Base folder of the docker image. All files outside of Containers/${FOLDER} or
 # Containers/shared_scripts get ignored by .dockerignore
@@ -53,6 +54,31 @@ ONBUILD RUN echo "slapd slapd/internal/generated_adminpw password ${ADMINPASSWOR
 # Reconfigure slapd to apply the configuration
 ONBUILD RUN dpkg-reconfigure -f noninteractive slapd
 
+# USER openldap
+# Get kerberos schema for openldap
+ONBUILD ADD /shared_scripts/schema/kerberos.schema.gz /etc/ldap/schema/kerberos.schema.gz
+ONBUILD RUN gunzip /etc/ldap/schema/kerberos.schema.gz
+# Add kerberos schema
+# ONBUILD RUN ldap-schema-manager -i kerberos.schema
+# ONBUILD RUN mkdir /tmp/setup/schema/
+# ONBUILD RUN slaptest -f /etc/ldap/schema/kerberos.schema -F /tmp/setup/schema/
+# ONBUILD RUN cp /tmp/setup/schema/cn=config/cn=schema.ldif /etc/ldap/slapd.d/cn=config/cn=schema.ldif
+# ONBUILD RUN slapadd -b cn=config -l /tmp/setup/cn=config/cn=schema.ldif
+# USER root
+
+# Create ldif for correct listeners (SLAPD_SERVICES in /etc/default/slapd)
+# ONBUILD ARG URLS
+# ONBUILD COPY /shared_scripts/modify_listeners.ldif.sh /tmp/setup
+# ONBUILD COPY /shared_scripts/modify_listeners.sh /tmp/setup
+# ONBUILD RUN /tmp/setup/modify_listeners.ldif.sh ${URLS}
+# ONBUILD RUN /tmp/setup/modify_listeners.sh ${URLS}
+# ONBUILD RUN rm /tmp/setup/modify_listeners.ldif.sh
+# ONBUILD RUN rm /tmp/setup/modify_listeners.sh
+# Apply listener settings
+# ONBUILD USER openldap
+# ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/modify_listeners.ldif
+# ONBUILD USER root
+
 # Create ldif file for server Id (needed for synchronisation)
 ONBUILD ARG SERVER_ID
 ONBUILD COPY /shared_scripts/set_serverId.ldif.sh /tmp/setup
@@ -60,7 +86,7 @@ ONBUILD RUN /tmp/setup/set_serverId.ldif.sh ${SERVER_ID}
 ONBUILD RUN rm /tmp/setup/set_serverId.ldif.sh
 # Apply server Id settings
 ONBUILD USER openldap
-# ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/set_serverId.ldif
+ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/set_serverId.ldif
 ONBUILD USER root
 # ONBUILD RUN rm /tmp/setup/set_serverId.ldif
 
@@ -70,25 +96,33 @@ ONBUILD RUN /tmp/setup/setup_provider.ldif.sh
 ONBUILD RUN rm /tmp/setup/setup_provider.ldif.sh
 # Apply provider settings
 ONBUILD USER openldap
-# ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/setup_provider.ldif
+ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/setup_provider.ldif
 ONBUILD USER root
 # ONBUILD RUN rm /tmp/setup/setup_provider.ldif
 
-# Create ldif for which servers to sync
 ONBUILD ARG SYNCSERVERS
+ONBUILD ARG SYNC_DN
+# Create ldif for which servers to sync
 ONBUILD COPY /shared_scripts/add_sync_servers.ldif.sh /tmp/setup
 ONBUILD RUN /tmp/setup/add_sync_servers.ldif.sh ${ROOTPASSWORD} ${SYNCSERVERS}
 ONBUILD RUN rm /tmp/setup/add_sync_servers.ldif.sh
 # Apply server sync settings
 ONBUILD USER openldap
-# ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/add_sync_servers.ldif
+ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/add_sync_servers.ldif
 ONBUILD USER root
 # ONBUILD RUN rm /tmp/setup/add_sync_servers.ldif
 
-# ONBUILD RUN service slapd stop
+# Create ldif for data to sync
+ONBUILD COPY /shared_scripts/add_data_replication.ldif.sh /tmp/setup
+ONBUILD RUN /tmp/setup/add_data_replication.ldif.sh ${ROOTPASSWORD} ${SYNC_DN} ${SYNCSERVERS}
+ONBUILD RUN rm /tmp/setup/add_data_replication.ldif.sh
+# Apply data sync settings
+ONBUILD USER openldap
+ONBUILD RUN slapmodify -b cn=config -l /tmp/setup/add_data_replication.ldif
+ONBUILD USER root
 
 # Change file ownership from slapmodify user(root) to openldap user
-# ONBUILD RUN chown -R openldap:openldap /etc/ldap/slapd.d /var/lib/ldap
-
+ONBUILD RUN chown -R openldap:openldap /etc/ldap /var/lib/ldap
+# ONBUILD USER openldap
 
 CMD /tmp/entrypoint.sh

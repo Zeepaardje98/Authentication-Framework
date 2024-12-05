@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat > /tmp/add_content.ldif <<EOF
+cat > /tmp/setup/add_content.ldif <<EOF
 dn: ou=People,$KRB_LDAP_DN
 objectClass: organizationalUnit
 ou: People

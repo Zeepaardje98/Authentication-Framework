@@ -5,27 +5,27 @@ echo "Set up Kerberos"
 
 ## STEP 1: SET UP KERBEROS WITH EXISTING OPENLDAP AS BACK-END ##
 
-service slapd start
+# service slapd start
 
-ldap-schema-manager -i kerberos.schema
+# ldap-schema-manager -i kerberos.schema
 
 # Add Index
-ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/krbPrincipalName_index.ldif
+ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/setup/krbPrincipalName_index.ldif
 
 # Add kerberos administrative entities
-ldapadd -w "$KRB_LDAP_PASSWORD" -x -D "cn=admin,$KRB_LDAP_DN" -f /tmp/add_kerberos_entities.ldif
-ldappasswd -w "$KRB_LDAP_PASSWORD" -x -D "cn=admin,$KRB_LDAP_DN" "uid=kdc-service,$KRB_LDAP_DN" -s "$KRB_KDC_PASSWORD"
-ldappasswd -w "$KRB_LDAP_PASSWORD" -x -D "cn=admin,$KRB_LDAP_DN" "uid=kadmin-service,$KRB_LDAP_DN" -s "$KRB_ADMIN_PASSWORD"
+ldapadd -w "$KRB_LDAP_PASSWORD" -H ldapi:/// -x -D "cn=admin,$KRB_LDAP_DN" -f /tmp/setup/add_kerberos_entities.ldif
+ldappasswd -w "$KRB_LDAP_PASSWORD" -H ldapi:/// -x -D "cn=admin,$KRB_LDAP_DN" "uid=kdc-service,$KRB_LDAP_DN" -s "$KRB_KDC_PASSWORD"
+ldappasswd -w "$KRB_LDAP_PASSWORD" -H ldapi:/// -x -D "cn=admin,$KRB_LDAP_DN" "uid=kadmin-service,$KRB_LDAP_DN" -s "$KRB_ADMIN_PASSWORD"
 
 # Test kdc service and admin users
-ldapwhoami -w "$KRB_KDC_PASSWORD" -x -D "uid=kdc-service,$KRB_LDAP_DN"
-ldapwhoami -w "$KRB_ADMIN_PASSWORD" -x -D "uid=kadmin-service,$KRB_LDAP_DN"
+ldapwhoami -w "$KRB_KDC_PASSWORD" -H ldapi:/// -x -D "uid=kdc-service,$KRB_LDAP_DN"
+ldapwhoami -w "$KRB_ADMIN_PASSWORD" -H ldapi:/// -x -D "uid=kadmin-service,$KRB_LDAP_DN"
 
 # Update ACLs
-ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/update_ACLs.ldif
+ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/setup/update_ACLs.ldif
 
 # Replace krb5.conf
-cp /tmp/krb5.conf /etc/krb5.conf
+cp /tmp/setup/krb5.conf /etc/krb5.conf
 
 # Create kerberos realm
 kdb5_ldap_util -D "cn=admin,$KRB_LDAP_DN" -w "$KRB_LDAP_PASSWORD" -H ldapi:/// create -P "$DB_PASS" -subtrees "$KRB_LDAP_DN" -s -r "$KRB_REALM"
@@ -35,10 +35,10 @@ yes $KRB_KDC_PASSWORD | kdb5_ldap_util -D "cn=admin,$KRB_LDAP_DN" -w "$KRB_LDAP_
 yes $KRB_ADMIN_PASSWORD | kdb5_ldap_util -D "cn=admin,$KRB_LDAP_DN" -w "$KRB_LDAP_PASSWORD" -H ldapi:/// stashsrvpw -f /etc/krb5kdc/service.keyfile "uid=kadmin-service,$KRB_LDAP_DN"
 
 # Create Access Control List for kerberos server
-cp /tmp/kadm5.acl /etc/krb5kdc/kadm5.acl
+cp /tmp/setup/kadm5.acl /etc/krb5kdc/kadm5.acl
 
 # Add LDAP users to kerberos
-ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/user_to_kerberos.ldif
+ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /tmp/setup/user_to_kerberos.ldif
 
 
 ## ADD PRINCIPALS ##
@@ -75,6 +75,6 @@ echo "List principals"
 kadmin.local -q listprincs
 
 service krb5-admin-server stop
-service slapd stop
+# service slapd stop
 
 echo "END KERBEROS SETUP"

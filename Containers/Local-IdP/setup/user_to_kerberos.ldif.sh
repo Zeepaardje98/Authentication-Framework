@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat > /tmp/user_to_kerberos.ldif <<EOF
+cat > /tmp/setup/user_to_kerberos.ldif <<EOF
 dn: olcDatabase={1}mdb,cn=config
 add: olcAccess
 olcAccess: {4}to dn.subtree="ou=People,$KRB_LDAP_DN"
