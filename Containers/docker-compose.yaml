@@ -95,6 +95,37 @@ services:
     networks:
       - ${CLOUD_IDP_NETWORK}
       - internet
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin             # Admin username
+      KEYCLOAK_ADMIN_PASSWORD: admin    # Admin password
+    command: start-dev                  # Use development mode
+    ports:
+      - "8080:8080"                     # Expose Keycloak on port 8080
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    networks:
+      - keycloak
+      - internet
+    depends_on:
+      - postgres                        # Ensures database is ready before Keycloak starts
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: keycloak           # Database username
+      POSTGRES_PASSWORD: keycloak       # Database password
+      POSTGRES_DB: keycloak             # Database name
+    networks:
+      - keycloak
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
 
 ### NETWORKS
@@ -108,6 +139,9 @@ networks:
   cloud-service1: # Network for a cloud Service
     driver: bridge
     name: ${CLOUD_NETWORK1}
+  keycloak:
+    driver: bridge
+    name: keycloak
   internet:
     driver: bridge
     name: web
@@ -116,3 +150,5 @@ networks:
 volumes:
   shared_ldap:  # Sharing the keytab from kerberos server to openldap service
   shared_sssd:  # Sharing the keytab from kerberos server to sssd client
+  keycloak-data:
+  postgres-data:
